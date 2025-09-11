@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "911242266797",
+    "project_id": "vocabulary-trainer-c5d02",
+    "storage_bucket": "vocabulary-trainer-c5d02.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:911242266797:android:74302180f74befa74d9e24",
+        "android_client_info": {
+          "package_name": "com.example.vocabulary_trainer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUcZLD_oIoNHTU17iP_daGPXzJysXU9a8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
