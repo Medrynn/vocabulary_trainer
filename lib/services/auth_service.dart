@@ -11,6 +11,10 @@ class AuthService extends ChangeNotifier {
   // Registrierung
   Future<String?> registerWithEmailAndPassword(String email, String password) async {
     try {
+      await _auth.createUserWithEmailAndPassword(
+      email: email, 
+      password: password
+    );
       notifyListeners();
       return null; // Erfolg
     } on FirebaseAuthException catch (e) {
@@ -32,6 +36,10 @@ class AuthService extends ChangeNotifier {
   // Anmeldung
   Future<String?> signInWithEmailAndPassword(String email, String password) async {
     try {
+      await _auth.signInWithEmailAndPassword(
+      email: email, 
+      password: password
+    );
       notifyListeners();
       return null; // Erfolg
     } on FirebaseAuthException catch (e) {
