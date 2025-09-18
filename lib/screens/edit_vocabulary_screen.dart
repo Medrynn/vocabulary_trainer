@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import '../services/firestore_service.dart';
 import '../models/vocabulary.dart';
 
-class AddVocabularyScreen extends StatefulWidget {
-  const AddVocabularyScreen({super.key});
+class EditVocabularyScreen extends StatefulWidget {
+  final Vocabulary vocabulary;
+
+  const EditVocabularyScreen({super.key, required this.vocabulary});
 
   @override
-  State<AddVocabularyScreen> createState() => _AddVocabularyScreenState();
+  State<EditVocabularyScreen> createState() => _EditVocabularyScreenState();
 }
 
-class _AddVocabularyScreenState extends State<AddVocabularyScreen> {
+class _EditVocabularyScreenState extends State<EditVocabularyScreen> {
   final _formKey = GlobalKey<FormState>();
   final _germanController = TextEditingController();
   final _foreignController = TextEditingController();
@@ -30,13 +32,22 @@ class _AddVocabularyScreenState extends State<AddVocabularyScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Felder mit aktuellen Werten füllen
+    _germanController.text = widget.vocabulary.german;
+    _foreignController.text = widget.vocabulary.foreign;
+    _selectedLanguage = widget.vocabulary.language;
+  }
+
+  @override
   void dispose() {
     _germanController.dispose();
     _foreignController.dispose();
     super.dispose();
   }
 
-  Future<void> _saveVocabulary() async {
+  Future<void> _updateVocabulary() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -44,33 +55,33 @@ class _AddVocabularyScreenState extends State<AddVocabularyScreen> {
     });
 
     try {
-      final vocabulary = Vocabulary(
+      final updatedVocabulary = Vocabulary(
+        id: widget.vocabulary.id,
         german: _germanController.text.trim(),
         foreign: _foreignController.text.trim(),
         language: _selectedLanguage,
-        createdAt: DateTime.now(),
+        createdAt: widget.vocabulary.createdAt, // Behalte Original-Datum
       );
 
-      await _firestoreService.addVocabulary(vocabulary);
-      if (mounted){
+      await _firestoreService.updateVocabulary(updatedVocabulary);
+      if (mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Vokabel erfolgreich hinzugefügt!'),
-          backgroundColor: Colors.green,
-        ),
-      );
+          SnackBar(
+            content: Text('Vokabel erfolgreich bearbeitet!'),
+            backgroundColor: Colors.green,
+          ),
+        );
       }
     } catch (e) {
-      if (mounted){
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Fehler beim Speichern: $e'),
+          content: Text('Fehler beim Bearbeiten: $e'),
           backgroundColor: Colors.red,
         ),
       );
       }
-      
     } finally {
       setState(() {
         _isLoading = false;
@@ -84,7 +95,7 @@ class _AddVocabularyScreenState extends State<AddVocabularyScreen> {
       backgroundColor: Colors.blue.shade50,
       appBar: AppBar(
         title: Text(
-          'Neue Vokabel',
+          'Vokabel bearbeiten',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.blue.shade600,
@@ -117,13 +128,13 @@ class _AddVocabularyScreenState extends State<AddVocabularyScreen> {
               child: Column(
                 children: [
                   Icon(
-                    Icons.add_circle_outline,
+                    Icons.edit,
                     size: 48,
                     color: Colors.blue.shade600,
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Neue Vokabel hinzufügen',
+                    'Vokabel bearbeiten',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -132,7 +143,7 @@ class _AddVocabularyScreenState extends State<AddVocabularyScreen> {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'Fülle alle Felder aus, um eine neue Vokabel zu speichern',
+                    'Ändere die Felder und speichere deine Vokabel',
                     style: TextStyle(
                       color: Colors.grey.shade600,
                       fontSize: 14,
@@ -272,7 +283,7 @@ class _AddVocabularyScreenState extends State<AddVocabularyScreen> {
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : _saveVocabulary,
+                      onPressed: _isLoading ? null : _updateVocabulary,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue.shade600,
                         foregroundColor: Colors.white,
@@ -303,7 +314,7 @@ class _AddVocabularyScreenState extends State<AddVocabularyScreen> {
                                 Icon(Icons.save, size: 24),
                                 SizedBox(width: 8),
                                 Text(
-                                  'Vokabel speichern',
+                                  'Änderungen speichern',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,

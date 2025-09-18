@@ -17,6 +17,15 @@ class FirestoreService {
     }
   }
 
+  // Vokabel bearbeiten
+  Future<void> updateVocabulary(Vocabulary vocabulary) async {
+    try {
+      await _vocabulariesCollection.doc(vocabulary.id).update(vocabulary.toMap());
+    } catch (e) {
+      throw Exception('Fehler beim Bearbeiten der Vokabel: $e');
+    }
+  }
+
   // Alle Vokabeln des Users abrufen
   Stream<List<Vocabulary>> getVocabularies() {
     return _vocabulariesCollection
@@ -43,6 +52,24 @@ class FirestoreService {
       return snapshot.docs.length;
     } catch (e) {
       return 0;
+    }
+  }
+
+  // Zufällige Vokabeln für Lernmodus
+  Future<List<Vocabulary>> getRandomVocabularies({int limit = 10}) async {
+    try {
+      QuerySnapshot snapshot = await _vocabulariesCollection.get();
+      List<Vocabulary> allVocabularies = snapshot.docs
+          .map((doc) => Vocabulary.fromFirestore(doc))
+          .toList();
+      
+      if (allVocabularies.isEmpty) return [];
+      
+      // Mische die Liste und nimm die ersten 'limit' Elemente
+      allVocabularies.shuffle();
+      return allVocabularies.take(limit).toList();
+    } catch (e) {
+      throw Exception('Fehler beim Laden der Lernvokabeln: $e');
     }
   }
 }

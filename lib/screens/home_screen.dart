@@ -4,10 +4,14 @@ import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
 import '../models/vocabulary.dart';
 import 'add_vocabulary_screen.dart';
+import 'edit_vocabulary_screen.dart';
+import 'learn_mode_screen.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -28,6 +32,17 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.blue.shade600,
         elevation: 0,
         actions: [
+          // Lernmodus Button
+          IconButton(
+            icon: Icon(Icons.quiz, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LearnModeScreen()),
+              );
+            },
+            tooltip: 'Lernmodus',
+          ),
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'logout') {
@@ -82,25 +97,51 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 SizedBox(height: 12),
-                FutureBuilder<int>(
-                  future: _firestoreService.getVocabularyCount(),
-                  builder: (context, snapshot) {
-                    int count = snapshot.data ?? 0;
-                    return Container(
+                Row(
+                  children: [
+                    FutureBuilder<int>(
+                      future: _firestoreService.getVocabularyCount(),
+                      builder: (context, snapshot) {
+                        int count = snapshot.data ?? 0;
+                        return Container(
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            '$count Vokabeln',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    SizedBox(width: 12),
+                    Container(
                       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Text(
-                        '$count Vokabeln',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.quiz, color: Colors.white, size: 16),
+                          SizedBox(width: 4),
+                          Text(
+                            'Lernmodus',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -242,9 +283,27 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         ),
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete_outline, color: Colors.red),
-                          onPressed: () => _deleteVocabulary(vocabulary),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Bearbeiten Button
+                            IconButton(
+                              icon: Icon(Icons.edit, color: Colors.blue.shade600),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditVocabularyScreen(vocabulary: vocabulary),
+                                  ),
+                                );
+                              },
+                            ),
+                            // Löschen Button
+                            IconButton(
+                              icon: Icon(Icons.delete_outline, color: Colors.red),
+                              onPressed: () => _deleteVocabulary(vocabulary),
+                            ),
+                          ],
                         ),
                       ),
                     );
